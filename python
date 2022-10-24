@@ -1,0 +1,108 @@
+import pygame, sys
+import button
+
+
+pygame.init()
+
+xsize = 500
+ysize = 500
+
+game_paused = False
+menu_state = "main"         #"main","option","sound","video","key","best_score"
+
+
+screen = pygame.display.set_mode((ysize, xsize))
+
+#title and icon
+pygame.display.set_caption("Asteroids")
+icon = pygame.image.load('images/letter-a.png')
+pygame.display.set_icon(icon)
+player_name = "Nycollas"
+
+
+################## Personagem 01 ####################
+def player():
+    playerImg = pygame.image.load('images/letter-a.png')
+    playerX = 0
+    playerY = 0
+    screen.blit(playerImg,(playerX,playerY))
+#####################################################
+
+
+
+################## TEXTOOOO ####################
+font = pygame.font.SysFont("arialblack", 20)
+Text_Color = ('white')
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img,(x,y))
+#####################################################
+
+############################################# Botões ##############################################
+####################  RESUME  #######################
+
+resume_img = pygame.image.load("images/button_resume.png").convert_alpha()
+#botao 
+resume_button = button.Button(185,100, resume_img,0.5)
+#####################################################
+
+####################   QUIT   #######################
+
+quit_img = pygame.image.load("images/button_quit.png").convert_alpha()
+#botao 
+quit_button = button.Button(200,150, quit_img,0.5)
+#####################################################
+
+####################  OPTION  #######################
+
+options_img = pygame.image.load("images/button_options.png").convert_alpha()
+#botao 
+options_button = button.Button(185,200, options_img,0.5)
+#####################################################
+
+####################   BACK   #######################
+
+back_img = pygame.image.load("images/button_back.png").convert_alpha()
+#botao 
+back_button = button.Button(200,250, back_img,0.5)
+#####################################################
+#####################################################################################################
+
+
+run = True
+
+while run :
+    # Cor da tela
+    screen.fill("black")
+
+    if game_paused == True:
+        draw_text(f"{player_name}", font, Text_Color, 185, 10)
+        if menu_state == "main":
+            if resume_button.draw(screen):
+                game_paused = False
+            if quit_button.draw(screen):
+                run = False
+                print("quit")
+            if options_button.draw(screen):
+                menu_state = "options"
+        if menu_state == "options":
+            if back_button.draw(screen):
+                menu_state = "main"
+
+    else:
+        draw_text("press ESC to Pause", font, Text_Color, 145, 10)
+        
+
+
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                game_paused = True
+                print("Pause")
+        if event.type == pygame.QUIT:
+            run = False
+    
+    
+    # player()
+    pygame.display.update()
