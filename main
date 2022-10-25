@@ -3,12 +3,13 @@ import pygame, sys, button
 
 pygame.init()
 clock = pygame.time.Clock()
-xsize = 1000
-ysize = 500
+xsize = 1000                        # LARGURA DA TELA 
+ysize = 500                         # ALTURA DA TELA
 
 tam_font = 30
 screen = pygame.display.set_mode((xsize, ysize))
 base_font = pygame.font.Font(None, tam_font)
+hyper_font = pygame.font.Font("fonts/HyperspaceBold-GM0g.ttf", tam_font)
 
 #title and icon
 pygame.display.set_caption("Asteroids")
@@ -16,32 +17,62 @@ icon = pygame.image.load('images/letter-a.png')
 pygame.display.set_icon(icon)
 
 
-player_name_text = "Nickname:"
-player_nickname = ''
+####################   QUIT BUTTON  #######################
+
+quit_img = pygame.image.load("images/button_quit.png").convert_alpha()
+#botao 
+quit_button = button.Button(0,0, quit_img,0.5)
+###########################################################
+
+
+
+player_name_text = "Nickname:"          #TEXTO ACIMA DA TEXTBOX DE NICKNAME
+player_nickname = ''                    #NICKNAME DO PLAYER
+
+
 ###### medidas retangulo texto #####
 xrect = 200
 yrect = 32
 input_rect = pygame.Rect(((xsize/2)-(xrect/2)),((ysize/2)-(yrect/2)),xrect,yrect)        # Medidas retangulo texto player_nickname
-color = pygame.Color('lightskyblue3')
+active_box = False
+color = pygame.Color('white')
 
 ###############################################################
-
-while 1:
+run = True
+while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_BACKSPACE:
-                player_nickname = player_nickname[:-1]
-            else:
-                player_nickname += event.unicode
-    
-
-
-
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if input_rect.collidepoint(event.pos):
+                active_box = True
+        
+        if active_box == True:
+            if len(player_nickname) < 17:
+                if event.type == pygame.KEYDOWN:                #Configuração de texto Nickname 
+                    if event.key == pygame.K_BACKSPACE:
+                        player_nickname = player_nickname[:-1]
+                    else:
+                        player_nickname += event.unicode
+            if event.type == pygame.KEYDOWN:                #Configuração de texto Nickname 
+                if event.key == pygame.K_BACKSPACE:
+                    player_nickname = player_nickname[:-1]
     screen.fill('black')
 
+
+
+    if quit_button.draw(screen):            #Botão quit na tela 
+        run = False
+        pygame.time.delay(50)
+
+
+
+    if active_box:
+        color = ((100, 100, 255))
+    else:
+        color = ('white')
 
     pygame.draw.rect(screen,color,input_rect,2)                 # Caixa de texto onde o player insere o nome
 
@@ -52,9 +83,10 @@ while 1:
     screen.blit(text_nick,(((xsize/2)-(xrect/2)+5),((ysize/2) - (yrect/2) + (tam_font/2) - (yrect/4))))                # Texto onde o player insere o nickname 
 
 
-    pygame.display.flip()
+    # pygame.display.flip()
     clock.tick(60)
+    print(player_nickname)
+    pygame.display.update()
 
 
-print(player_nickname)
 
