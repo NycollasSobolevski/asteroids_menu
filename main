@@ -1,0 +1,60 @@
+import pygame, sys, button
+
+
+pygame.init()
+clock = pygame.time.Clock()
+xsize = 1000
+ysize = 500
+
+tam_font = 30
+screen = pygame.display.set_mode((xsize, ysize))
+base_font = pygame.font.Font(None, tam_font)
+
+#title and icon
+pygame.display.set_caption("Asteroids")
+icon = pygame.image.load('images/letter-a.png')
+pygame.display.set_icon(icon)
+
+
+player_name_text = "Nickname:"
+player_nickname = ''
+###### medidas retangulo texto #####
+xrect = 200
+yrect = 32
+input_rect = pygame.Rect(((xsize/2)-(xrect/2)),((ysize/2)-(yrect/2)),xrect,yrect)        # Medidas retangulo texto player_nickname
+color = pygame.Color('lightskyblue3')
+
+###############################################################
+
+while 1:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_BACKSPACE:
+                player_nickname = player_nickname[:-1]
+            else:
+                player_nickname += event.unicode
+    
+
+
+
+    screen.fill('black')
+
+
+    pygame.draw.rect(screen,color,input_rect,2)                 # Caixa de texto onde o player insere o nome
+
+    text_surface = base_font.render(player_name_text,True,'white')
+    screen.blit(text_surface,(((xsize/2)-(tam_font*2)),((ysize/2) - (tam_font/2))-yrect  ))                   # Texto player_name_text
+
+    text_nick = base_font.render(player_nickname,True,'white')
+    screen.blit(text_nick,(((xsize/2)-(xrect/2)+5),((ysize/2) - (yrect/2) + (tam_font/2) - (yrect/4))))                # Texto onde o player insere o nickname 
+
+
+    pygame.display.flip()
+    clock.tick(60)
+
+
+print(player_nickname)
+
