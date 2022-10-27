@@ -1,92 +1,252 @@
-import pygame, sys, button
+from ast import Global
+from turtle import color
+import pygame, sys, button, pandas as pd
 
 
+tabelaScore = pd.read_csv("points.csv")
 pygame.init()
 clock = pygame.time.Clock()
 xsize = 1000                        # LARGURA DA TELA 
 ysize = 500                         # ALTURA DA TELA
 
-tam_font = 30
+player_nickname = ''                # NICKNAME DO PLAYER
+
 screen = pygame.display.set_mode((xsize, ysize))
-base_font = pygame.font.Font(None, tam_font)
-hyper_font = pygame.font.Font("fonts/HyperspaceBold-GM0g.ttf", tam_font)
 
 #title and icon
 pygame.display.set_caption("Asteroids")
 icon = pygame.image.load('images/letter-a.png')
 pygame.display.set_icon(icon)
 
-
-####################   QUIT BUTTON  #######################
-
-quit_img = pygame.image.load("images/button_quit.png").convert_alpha()
-#botao 
-quit_button = button.Button(0,0, quit_img,0.5)
-###########################################################
-
-
-
-player_name_text = "Nickname:"          #TEXTO ACIMA DA TEXTBOX DE NICKNAME
-player_nickname = ''                    #NICKNAME DO PLAYER
-
-
-###### medidas retangulo texto #####
-xrect = 200
-yrect = 32
-input_rect = pygame.Rect(((xsize/2)-(xrect/2)),((ysize/2)-(yrect/2)),xrect,yrect)        # Medidas retangulo texto player_nickname
-active_box = False
-color = pygame.Color('white')
-
-###############################################################
 run = True
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if input_rect.collidepoint(event.pos):
-                active_box = True
-        
-        if active_box == True:
-            if len(player_nickname) < 17:
+################## TEXTOOOO ####################
+tam_font = 30
+base_font = pygame.font.Font(None, tam_font)
+hyper_font = pygame.font.Font("fonts/HyperspaceBold-GM0g.ttf", tam_font)
+font = pygame.font.SysFont("arialblack", 20)
+Text_Color = ('white')
+def draw_text(text, font, text_color, x, y):
+    img = font.render(text, True, text_color)
+    screen.blit(img,(x,y))
+################################################
+
+def mainPage(run):
+    ####################   QUIT BUTTON  #######################
+    global player_nickname 
+    quit_img = pygame.image.load("images/button_quit.png").convert_alpha()
+    #botao 
+    quit_button = button.Button(0,0, quit_img,0.5)
+    ###########################################################
+    tam_background = 0.5
+    background_img = pygame.image.load("images/backgroung.jpg").convert_alpha()
+    back_button = button.Button(0,0,background_img,tam_background)
+
+
+
+
+    ###### medidas retangulo texto #####
+    xrect = 200         #tamanho de x (Largura)
+    yrect = 28          #tamanho de y (altura)
+    xrect_pos = (xsize/2)-(xrect/2)   # posição x
+    yrect_pos = (100)-(yrect/2)   # posição y 
+    input_rect = pygame.Rect(xrect_pos,yrect_pos,xrect,yrect)        # Medidas retangulo texto player_nickname
+    active_box = False
+    colorBox = pygame.Color('white')
+
+    ##### Retangulo best's score's #####
+    def points_rect():
+        x = 300
+        y = 250
+        xBestRecord_pos = xsize/2 - x/2
+        yBestRecord_pos = ysize/2 - y/4
+        draw_text("Best Records",base_font,Text_Color,xsize/2-65,yBestRecord_pos-20)     #a frase tem 130 de tamanho 
+        BestRecord_rect = pygame.Rect(xBestRecord_pos,yBestRecord_pos,x,y)
+        color = pygame.Color('white')
+        pygame.draw.rect(screen,color,BestRecord_rect,3)
+        def divisions(xPos,yPos,multiply,xTam,yTam):
+            x1 = xTam
+            y1 = yTam/5
+            xPos = xPos
+            yPos = yPos+(y1*multiply)
+            divisionRecord = pygame.Rect(xPos,yPos,x1,y1)
+            pygame.draw.rect(screen,color,divisionRecord,1)
+        divisions(xBestRecord_pos,yBestRecord_pos,0,x,y)
+        divisions(xBestRecord_pos,yBestRecord_pos,1,x,y)
+        divisions(xBestRecord_pos,yBestRecord_pos,2,x,y)
+        divisions(xBestRecord_pos,yBestRecord_pos,3,x,y)
+        divisions(xBestRecord_pos,yBestRecord_pos,4,x,y)
+
+
+
+    ###############################################################
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if input_rect.collidepoint(event.pos):
+                    active_box = True
+            
+            if active_box == True:
+                if len(player_nickname) < 17:
+                    if event.type == pygame.KEYDOWN:                #Configuração de texto Nickname 
+                        if event.key == pygame.K_BACKSPACE:
+                            player_nickname = player_nickname[:-1]
+                        else:
+                            player_nickname += event.unicode
                 if event.type == pygame.KEYDOWN:                #Configuração de texto Nickname 
                     if event.key == pygame.K_BACKSPACE:
                         player_nickname = player_nickname[:-1]
-                    else:
-                        player_nickname += event.unicode
-            if event.type == pygame.KEYDOWN:                #Configuração de texto Nickname 
-                if event.key == pygame.K_BACKSPACE:
+            if event.type == pygame.KEYDOWN:                #Configuração esc 
+                if event.key == pygame.K_ESCAPE:
                     player_nickname = player_nickname[:-1]
-    screen.fill('black')
+                    playPause(run)
+                if event.key == pygame.K_RETURN:
+                    player_nickname = player_nickname[:-1]
+                    playPause(run)
+        screen.fill('black')
+
+        if back_button.draw(screen):
+            pass
+
+        if quit_button.draw(screen):            #Botão quit na tela 
+            run = False
+            pygame.time.delay(50)
 
 
 
-    if quit_button.draw(screen):            #Botão quit na tela 
-        run = False
-        pygame.time.delay(50)
+        if active_box:
+            colorBox = ((100, 100, 255))
+        else:
+            colorBox = ('white')
+
+        pygame.draw.rect(screen,colorBox,input_rect,3)                 # Caixa de texto onde o player insere o nome
+
+        draw_text("Nickname:",base_font,Text_Color,xrect_pos+47,yrect_pos-25)
+        text_nick = base_font.render(player_nickname,True,'white')
+        screen.blit(text_nick,((xrect_pos+5),(yrect_pos + (tam_font/2) - (yrect/4))))                # Texto onde o player insere o nickname 
+
+        points_rect()
+      
+        clock.tick(60)
+        print(player_nickname)
+        pygame.display.update()
+        
 
 
 
-    if active_box:
-        color = ((100, 100, 255))
-    else:
-        color = ('white')
-
-    pygame.draw.rect(screen,color,input_rect,2)                 # Caixa de texto onde o player insere o nome
-
-    text_surface = base_font.render(player_name_text,True,'white')
-    screen.blit(text_surface,(((xsize/2)-(tam_font*2)),((ysize/2) - (tam_font/2))-yrect  ))                   # Texto player_name_text
-
-    text_nick = base_font.render(player_nickname,True,'white')
-    screen.blit(text_nick,(((xsize/2)-(xrect/2)+5),((ysize/2) - (yrect/2) + (tam_font/2) - (yrect/4))))                # Texto onde o player insere o nickname 
-
-
-    # pygame.display.flip()
-    clock.tick(60)
-    print(player_nickname)
-    pygame.display.update()
 
 
 
+def playPause(run):
+    game_paused = False
+    menu_state = "main"         #"main","option","sound","video","key"
+
+
+    screen = pygame.display.set_mode((xsize, ysize))
+
+    #title and icon
+    pygame.display.set_caption("Asteroids")
+    icon = pygame.image.load('images/letter-a.png')
+    pygame.display.set_icon(icon)
+
+
+    #####################################################   Botões   #####################################################
+    ####################  RESUME  #######################   142 x 38
+
+    resume_img = pygame.image.load("images/button_resume.png").convert_alpha()
+    #botao 
+    resume_button = button.Button((xsize/2) - 65, ysize/2-100, resume_img,0.5)
+    #####################################################
+    ####################   QUIT   #######################       285 x 75
+
+    quit_img = pygame.image.load("images/button_quit.png").convert_alpha()
+    #botao 
+    quit_button = button.Button((xsize/2) - 65, ysize/2, quit_img,0.5)
+    #####################################################
+    ####################  OPTION  #######################       285 x 75
+
+    options_img = pygame.image.load("images/button_options.png").convert_alpha()
+    #botao 
+    options_button = button.Button((xsize/2) - 65,ysize/2-50, options_img,0.5)
+    ##################################################### SEGUNDA TELA ##################################################### 
+    ####################   BACK   #######################       285 x 75
+
+    back_img = pygame.image.load("images/button_back.png").convert_alpha()
+    #botao 
+    back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,0.5)
+    #####################################################
+    ####################   AUDIO   #######################       285 x 75
+
+    audio_img = pygame.image.load("images/button_audio.png").convert_alpha()
+    #botao 
+    audio_button = button.Button((xsize/2) - 65,ysize/2-100, audio_img,0.5)
+    #####################################################
+    ####################   VIDEO   #######################       285 x 75
+
+    video_img = pygame.image.load("images/button_video.png").convert_alpha()
+    #botao 
+    video_button = button.Button((xsize/2) - 65,ysize/2-50, video_img,0.5)
+    #####################################################
+    ####################   KEYS   #######################       285 x 75
+
+    keys_img = pygame.image.load("images/button_keys.png").convert_alpha()
+    #botao 
+    keys_button = button.Button((xsize/2) - 65,ysize/2, keys_img,0.5)
+    #####################################################
+    #####################################################################################################
+
+    tam_playerName = (len(player_nickname)/2)* 20
+
+
+
+    while run :
+        # Cor da tela
+        screen.fill("black")
+        game_paused = True
+        if game_paused == True:
+            draw_text(f"{player_nickname}", font, Text_Color, (xsize/2)-tam_playerName, 25)
+            if menu_state == "main":
+                if resume_button.draw(screen):
+                    game_paused = False
+                    pygame.time.delay(100)
+                if quit_button.draw(screen):
+                    run = False
+                    pygame.time.delay(100)
+                    print("quit")
+                if options_button.draw(screen):
+                    menu_state = "options"
+                    pygame.time.delay(100)
+            if menu_state == "options":
+                if back_button.draw(screen):
+                    menu_state = "main"
+                    pygame.time.delay(100)
+                if audio_button.draw(screen):
+                    menu_state = "main"
+                    pygame.time.delay(100)
+                if video_button.draw(screen):
+                    menu_state = "main"
+                    pygame.time.delay(100)
+                if keys_button.draw(screen):
+                    menu_state = "main"
+                    pygame.time.delay(100)
+            
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    game_paused = True
+                    print("Pause")
+            if event.type == pygame.QUIT:
+                run = False
+        
+        
+        pygame.display.update()
+
+
+
+
+mainPage(run)
