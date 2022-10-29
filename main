@@ -1,15 +1,20 @@
 from ast import Global
+from tkinter import N
 from turtle import color
-import pygame, sys, button, pandas as pd
+import pygame, sys, button
+import pandas as pd
+
+#lendo arquivo csv
+scoreArc = pd.read_csv("points.csv")
+scoreArc = scoreArc.sort_values(by='Score',ascending=False).reset_index()
+print(scoreArc)
 
 
-tabelaScore = pd.read_csv("points.csv")
 pygame.init()
 clock = pygame.time.Clock()
-xsize = 1000                        # LARGURA DA TELA 
-ysize = 500                         # ALTURA DA TELA
+xsize = 854                        # LARGURA DA TELA 
+ysize = 480                         # ALTURA DA TELA
 
-player_nickname = ''                # NICKNAME DO PLAYER
 
 screen = pygame.display.set_mode((xsize, ysize))
 
@@ -25,10 +30,14 @@ base_font = pygame.font.Font(None, tam_font)
 hyper_font = pygame.font.Font("fonts/HyperspaceBold-GM0g.ttf", tam_font)
 font = pygame.font.SysFont("arialblack", 20)
 Text_Color = ('white')
+
+
 def draw_text(text, font, text_color, x, y):
     img = font.render(text, True, text_color)
     screen.blit(img,(x,y))
 ################################################
+player_nickname = ''                # NICKNAME DO PLAYER
+Player_score = 0
 
 def mainPage(run):
     ####################   QUIT BUTTON  #######################
@@ -69,15 +78,17 @@ def mainPage(run):
             xPos = xPos
             yPos = yPos+(y1*multiply)
             divisionRecord = pygame.Rect(xPos,yPos,x1,y1)
+            primeiro = scoreArc['Nickname'][multiply]
+            Score = scoreArc['Score'][multiply]
+            draw_text(f'{primeiro}', base_font, color, xPos+x1*0.05, yPos+y1*0.33)
+            draw_text(f"{Score}", base_font, color, xPos+x1*0.75, yPos+y1*0.33)
             pygame.draw.rect(screen,color,divisionRecord,1)
         divisions(xBestRecord_pos,yBestRecord_pos,0,x,y)
         divisions(xBestRecord_pos,yBestRecord_pos,1,x,y)
         divisions(xBestRecord_pos,yBestRecord_pos,2,x,y)
         divisions(xBestRecord_pos,yBestRecord_pos,3,x,y)
         divisions(xBestRecord_pos,yBestRecord_pos,4,x,y)
-
-
-
+        
     ###############################################################
     while run:
         for event in pygame.event.get():
@@ -115,8 +126,6 @@ def mainPage(run):
             run = False
             pygame.time.delay(50)
 
-
-
         if active_box:
             colorBox = ((100, 100, 255))
         else:
@@ -131,7 +140,7 @@ def mainPage(run):
         points_rect()
       
         clock.tick(60)
-        print(player_nickname)
+        # print(player_nickname)
         pygame.display.update()
         
 
@@ -155,47 +164,64 @@ def playPause(run):
 
     #####################################################   Botões   #####################################################
     ####################  RESUME  #######################   142 x 38
-
+    keys_tam = 0.5
     resume_img = pygame.image.load("images/button_resume.png").convert_alpha()
     #botao 
-    resume_button = button.Button((xsize/2) - 65, ysize/2-100, resume_img,0.5)
+    resume_button = button.Button((xsize/2) - 65, ysize/2-100, resume_img,keys_tam)
     #####################################################
     ####################   QUIT   #######################       285 x 75
 
     quit_img = pygame.image.load("images/button_quit.png").convert_alpha()
     #botao 
-    quit_button = button.Button((xsize/2) - 65, ysize/2, quit_img,0.5)
+    quit_button = button.Button((xsize/2) - 65, ysize/2, quit_img,keys_tam)
     #####################################################
     ####################  OPTION  #######################       285 x 75
 
     options_img = pygame.image.load("images/button_options.png").convert_alpha()
     #botao 
-    options_button = button.Button((xsize/2) - 65,ysize/2-50, options_img,0.5)
+    options_button = button.Button((xsize/2) - 65,ysize/2-50, options_img,keys_tam)
     ##################################################### SEGUNDA TELA ##################################################### 
     ####################   BACK   #######################       285 x 75
 
     back_img = pygame.image.load("images/button_back.png").convert_alpha()
     #botao 
-    back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,0.5)
+    back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,keys_tam)
     #####################################################
     ####################   AUDIO   #######################       285 x 75
 
     audio_img = pygame.image.load("images/button_audio.png").convert_alpha()
     #botao 
-    audio_button = button.Button((xsize/2) - 65,ysize/2-100, audio_img,0.5)
+    audio_button = button.Button((xsize/2) - 65,ysize/2-100, audio_img,keys_tam)
     #####################################################
     ####################   VIDEO   #######################       285 x 75
 
     video_img = pygame.image.load("images/button_video.png").convert_alpha()
     #botao 
-    video_button = button.Button((xsize/2) - 65,ysize/2-50, video_img,0.5)
+    video_button = button.Button((xsize/2) - 65,ysize/2-50, video_img,keys_tam)
     #####################################################
     ####################   KEYS   #######################       285 x 75
-
     keys_img = pygame.image.load("images/button_keys.png").convert_alpha()
     #botao 
-    keys_button = button.Button((xsize/2) - 65,ysize/2, keys_img,0.5)
-    #####################################################
+    keys_button = button.Button((xsize/2) - 65,ysize/2, keys_img,keys_tam)
+
+    xKeys_pos = xsize/4
+    yKeys_pos = ysize/3
+    
+
+    key_top = pygame.image.load("images/top.png").convert_alpha()
+    top_button = button.Button(xKeys_pos,yKeys_pos-85*2*keys_tam,key_top,keys_tam)
+    key_left = pygame.image.load("images/left.png").convert_alpha()
+    left_button = button.Button(xKeys_pos-50*keys_tam, yKeys_pos-85*keys_tam,key_left,keys_tam)
+    key_right = pygame.image.load("images/right.png").convert_alpha()
+    right_button = button.Button(xKeys_pos+50*keys_tam, yKeys_pos-85*keys_tam,key_right,keys_tam)
+    key_down = pygame.image.load("images/down.png").convert_alpha()
+    down_button = button.Button(xKeys_pos, yKeys_pos,key_down,keys_tam)
+
+    key_space = pygame.image.load("images/space.png").convert_alpha()
+    space_button = button.Button(xKeys_pos, yKeys_pos+191*keys_tam,key_space,keys_tam)
+    key_teleport = pygame.image.load("images/space.png").convert_alpha()
+    teleport_button = button.Button(xKeys_pos, yKeys_pos+191*2*keys_tam,key_teleport,keys_tam)
+
     #####################################################################################################
 
     tam_playerName = (len(player_nickname)/2)* 20
@@ -219,19 +245,48 @@ def playPause(run):
                 if options_button.draw(screen):
                     menu_state = "options"
                     pygame.time.delay(100)
-            if menu_state == "options":
+            elif menu_state == "options":
                 if back_button.draw(screen):
                     menu_state = "main"
                     pygame.time.delay(100)
-                if audio_button.draw(screen):
+                elif audio_button.draw(screen):
                     menu_state = "main"
                     pygame.time.delay(100)
-                if video_button.draw(screen):
-                    menu_state = "main"
+                elif video_button.draw(screen):
+                    menu_state = "video"
                     pygame.time.delay(100)
-                if keys_button.draw(screen):
-                    menu_state = "main"
+                elif keys_button.draw(screen):
+                    menu_state = "keys"
                     pygame.time.delay(100)
+            elif menu_state == "keys":
+                top_button.draw(screen)
+                left_button.draw(screen)
+                right_button.draw(screen)
+                down_button.draw(screen)
+                space_button.draw(screen) 
+                teleport_button.draw(screen) 
+                draw_text("Mover",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos-85+(95*keys_tam)*0.25)
+                draw_text("Virar",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos-42+(95*keys_tam)*0.25)
+                draw_text("Parar",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(95*keys_tam)*0.25)
+                draw_text("Atirar",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(191*keys_tam)+(95*keys_tam)*0.25)
+                draw_text("Teleport",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(191*2*keys_tam)+(95*keys_tam)*0.25)
+                back_button = button.Button(xsize - 65*2,ysize-50*2, back_img,keys_tam)
+                if back_button.draw(screen):
+                    menu_state = "options"
+                    back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,keys_tam)
+                    pygame.time.delay(100)    
+                if event.type == pygame.KEYDOWN:                #Configuração esc 
+                    if event.key == pygame.K_ESCAPE:
+                        menu_state = "options"
+            elif menu_state == "video":
+                if back_button.draw(screen):
+                    menu_state = "options"
+                    back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,keys_tam)
+                    pygame.time.delay(100)    
+                if event.type == pygame.KEYDOWN:                #Configuração esc 
+                    if event.key == pygame.K_ESCAPE:
+                        menu_state = "options"
+
             
 
 
@@ -243,10 +298,14 @@ def playPause(run):
             if event.type == pygame.QUIT:
                 run = False
         
-        
+        print(menu_state)
         pygame.display.update()
 
 
 
 
 mainPage(run)
+
+addLinha = pd.DataFrame({'Nickname':player_nickname,'Score':Player_score},index=[len(scoreArc['Nickname'])+1])
+scoreArc = pd.concat([addLinha,scoreArc])
+scoreArc.to_csv('points.csv',columns = ['Nickname','Score'],index=False)
