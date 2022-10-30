@@ -9,11 +9,12 @@ scoreArc = pd.read_csv("points.csv")
 scoreArc = scoreArc.sort_values(by='Score',ascending=False).reset_index()
 print(scoreArc)
 
-
+resolution = 480
 pygame.init()
 clock = pygame.time.Clock()
 xsize = 854                        # LARGURA DA TELA 
 ysize = 480                         # ALTURA DA TELA
+
 
 
 screen = pygame.display.set_mode((xsize, ysize))
@@ -23,7 +24,7 @@ pygame.display.set_caption("Asteroids")
 icon = pygame.image.load('images/letter-a.png')
 pygame.display.set_icon(icon)
 
-run = True
+running = True
 ################## TEXTOOOO ####################
 tam_font = 30
 base_font = pygame.font.Font(None, tam_font)
@@ -40,8 +41,11 @@ player_nickname = ''                # NICKNAME DO PLAYER
 Player_score = 0
 
 def mainPage(run):
+    
     ####################   QUIT BUTTON  #######################
     global player_nickname 
+    global xsize
+    global ysize
     quit_img = pygame.image.load("images/button_quit.png").convert_alpha()
     #botao 
     quit_button = button.Button(0,0, quit_img,0.5)
@@ -91,6 +95,22 @@ def mainPage(run):
         
     ###############################################################
     while run:
+        if resolution == 480:
+            xsize = 854
+            ysize = 480
+        elif resolution == 720:
+            xsize = 1280
+            ysize = 720
+        elif resolution == 1080:
+            xsize = 1920
+            ysize = 1080
+        xrect = 200         #tamanho de x (Largura)
+        yrect = 28          #tamanho de y (altura)
+        xrect_pos = (xsize/2)-(xrect/2)   # posição x
+        yrect_pos = (100)-(yrect/2)   # posição y 
+        input_rect = pygame.Rect(xrect_pos,yrect_pos,xrect,yrect)        # Medidas retangulo texto player_nickname
+        colorBox = pygame.Color('white')
+        screen = pygame.display.set_mode((xsize, ysize))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -113,10 +133,10 @@ def mainPage(run):
             if event.type == pygame.KEYDOWN:                #Configuração esc 
                 if event.key == pygame.K_ESCAPE:
                     player_nickname = player_nickname[:-1]
-                    playPause(run)
+                    playPause()
                 if event.key == pygame.K_RETURN:
                     player_nickname = player_nickname[:-1]
-                    playPause(run)
+                    playPause()
         screen.fill('black')
 
         if back_button.draw(screen):
@@ -149,7 +169,10 @@ def mainPage(run):
 
 
 
-def playPause(run):
+def playPause():
+    global run
+    run = True
+    global resolution
     game_paused = False
     menu_state = "main"         #"main","option","sound","video","key"
 
@@ -239,13 +262,16 @@ def playPause(run):
                     game_paused = False
                     pygame.time.delay(100)
                 if quit_button.draw(screen):
+                    global running
+                    running = False
                     run = False
                     pygame.time.delay(100)
                     print("quit")
                 if options_button.draw(screen):
                     menu_state = "options"
-                    pygame.time.delay(100)
+                    pygame.time.delay(250)
             elif menu_state == "options":
+                back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,keys_tam)
                 if back_button.draw(screen):
                     menu_state = "main"
                     pygame.time.delay(100)
@@ -273,16 +299,29 @@ def playPause(run):
                 back_button = button.Button(xsize - 65*2,ysize-50*2, back_img,keys_tam)
                 if back_button.draw(screen):
                     menu_state = "options"
-                    back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,keys_tam)
                     pygame.time.delay(100)    
                 if event.type == pygame.KEYDOWN:                #Configuração esc 
                     if event.key == pygame.K_ESCAPE:
                         menu_state = "options"
             elif menu_state == "video":
+                #################### Video Settings ######################
+                qhd = pygame.image.load('images/480.png').convert_alpha()
+                qhd_button = button.Button((xsize/2) - 65*3,ysize/3,qhd,keys_tam)
+                hd = pygame.image.load('images/720.png').convert_alpha()
+                hd_button = button.Button((xsize/2) - 65,ysize/3,hd,keys_tam)
+                fullhd = pygame.image.load('images/1080.png').convert_alpha()
+                fullhd_button = button.Button((xsize/2) + 65,ysize/3,fullhd,keys_tam)
+
                 if back_button.draw(screen):
                     menu_state = "options"
                     back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,keys_tam)
-                    pygame.time.delay(100)    
+                    pygame.time.delay(100)
+                if qhd_button.draw(screen):
+                    resolution = 480
+                if hd_button.draw(screen):
+                    resolution = 720
+                if fullhd_button.draw(screen):
+                    resolution = 1080
                 if event.type == pygame.KEYDOWN:                #Configuração esc 
                     if event.key == pygame.K_ESCAPE:
                         menu_state = "options"
@@ -298,13 +337,13 @@ def playPause(run):
             if event.type == pygame.QUIT:
                 run = False
         
-        print(menu_state)
         pygame.display.update()
 
 
 
 
-mainPage(run)
+mainPage(running)
+print(resolution)
 
 addLinha = pd.DataFrame({'Nickname':player_nickname,'Score':Player_score},index=[len(scoreArc['Nickname'])+1])
 scoreArc = pd.concat([addLinha,scoreArc])
