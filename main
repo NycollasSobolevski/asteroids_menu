@@ -1,8 +1,6 @@
-from ast import Global
-from tkinter import N
-from turtle import color
 import pygame, sys, button
 import pandas as pd
+from pygame import mixer
 
 #lendo arquivo csv
 scoreArc = pd.read_csv("points.csv")
@@ -32,6 +30,8 @@ hyper_font = pygame.font.Font("fonts/HyperspaceBold-GM0g.ttf", tam_font)
 font = pygame.font.SysFont("arialblack", 20)
 Text_Color = ('white')
 
+background_music = mixer.music.load('songs/Master_of_Puppets.wav')
+mixer.music.play(-1)
 
 def draw_text(text, font, text_color, x, y):
     img = font.render(text, True, text_color)
@@ -53,7 +53,6 @@ def mainPage(run):
     tam_background = 0.5
     background_img = pygame.image.load("images/backgroung.jpg").convert_alpha()
     back_button = button.Button(0,0,background_img,tam_background)
-
 
 
 
@@ -111,6 +110,7 @@ def mainPage(run):
         input_rect = pygame.Rect(xrect_pos,yrect_pos,xrect,yrect)        # Medidas retangulo texto player_nickname
         colorBox = pygame.Color('white')
         screen = pygame.display.set_mode((xsize, ysize))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -160,7 +160,7 @@ def mainPage(run):
         points_rect()
       
         clock.tick(60)
-        # print(player_nickname)
+
         pygame.display.update()
         
 
@@ -243,7 +243,6 @@ def playPause():
     key_space = pygame.image.load("images/space.png").convert_alpha()
     space_button = button.Button(xKeys_pos, yKeys_pos+191*keys_tam,key_space,keys_tam)
     key_teleport = pygame.image.load("images/space.png").convert_alpha()
-    teleport_button = button.Button(xKeys_pos, yKeys_pos+191*2*keys_tam,key_teleport,keys_tam)
 
     #####################################################################################################
 
@@ -276,7 +275,7 @@ def playPause():
                     menu_state = "main"
                     pygame.time.delay(100)
                 elif audio_button.draw(screen):
-                    menu_state = "main"
+                    menu_state = "audio"
                     pygame.time.delay(100)
                 elif video_button.draw(screen):
                     menu_state = "video"
@@ -290,12 +289,11 @@ def playPause():
                 right_button.draw(screen)
                 down_button.draw(screen)
                 space_button.draw(screen) 
-                teleport_button.draw(screen) 
-                draw_text("Mover",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos-85+(95*keys_tam)*0.25)
-                draw_text("Virar",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos-42+(95*keys_tam)*0.25)
-                draw_text("Parar",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(95*keys_tam)*0.25)
-                draw_text("Atirar",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(191*keys_tam)+(95*keys_tam)*0.25)
-                draw_text("Teleport",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(191*2*keys_tam)+(95*keys_tam)*0.25)
+                draw_text("Move",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos-85+(95*keys_tam)*0.25)
+                draw_text("Direction",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos-42+(95*keys_tam)*0.25)
+                draw_text("Teleport",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(95*keys_tam)*0.25)
+                draw_text("Shoot",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(191*keys_tam)+(95*keys_tam)*0.25)
+                # draw_text("Teleport",base_font,'white',(xKeys_pos*2)+(100*keys_tam),yKeys_pos+(191*2*keys_tam)+(95*keys_tam)*0.25)
                 back_button = button.Button(xsize - 65*2,ysize-50*2, back_img,keys_tam)
                 if back_button.draw(screen):
                     menu_state = "options"
@@ -325,7 +323,37 @@ def playPause():
                 if event.type == pygame.KEYDOWN:                #Configuração esc 
                     if event.key == pygame.K_ESCAPE:
                         menu_state = "options"
-
+            elif menu_state == "audio":
+                draw_text(f"Volume: {mixer.music.get_volume()}", font, Text_Color, (xsize/2)-tam_playerName, 25)
+                mute = pygame.image.load("images/mute.png")
+                mute_button = button.Button((xsize/2) - 65,ysize/3,mute,keys_tam)
+                unmute = pygame.image.load("images/unmute.png")
+                unmute_button = button.Button((xsize/2) - 65,ysize/4,unmute,keys_tam)
+                volMax = pygame.image.load("images/vol_max.png")
+                volMax_button = button.Button((xsize/3) - 65,ysize/4,volMax,keys_tam)
+                volMin = pygame.image.load("images/vol_min.png")
+                volMin_button = button.Button((xsize/3) - 65,ysize/4,volMin,keys_tam)
+                volume = 100
+                if volMin_button.draw(screen):
+                    volume = volume - 10
+                    mixer.music.set_volume(volume)
+                if volMax_button.draw(screen):
+                    volume = volume + 10
+                    mixer.music.set_volume(volume)
+                if mute_button.draw(screen):
+                    volume=0
+                    mixer.music.set_volume(volume)
+                if unmute_button.draw(screen):
+                    volume=100
+                    mixer.music.set_volume(volume)
+                if back_button.draw(screen):
+                    menu_state = "options"
+                    back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,keys_tam)
+                    pygame.time.delay(100)
+                if event.type == pygame.KEYDOWN:                #Configuração esc 
+                    if event.key == pygame.K_ESCAPE:
+                        menu_state = "options"
+                
             
 
 
@@ -343,7 +371,6 @@ def playPause():
 
 
 mainPage(running)
-print(resolution)
 
 addLinha = pd.DataFrame({'Nickname':player_nickname,'Score':Player_score},index=[len(scoreArc['Nickname'])+1])
 scoreArc = pd.concat([addLinha,scoreArc])
