@@ -32,6 +32,8 @@ Text_Color = ('white')
 
 background_music = mixer.music.load('songs/Master_of_Puppets.wav')
 mixer.music.play(-1)
+volume = 1 
+shooterFx = mixer.Sound("songs/fire.wav")
 
 def draw_text(text, font, text_color, x, y):
     img = font.render(text, True, text_color)
@@ -247,7 +249,7 @@ def playPause():
     #####################################################################################################
 
     tam_playerName = (len(player_nickname)/2)* 20
-
+    volume = 100
 
 
     while run :
@@ -255,13 +257,13 @@ def playPause():
         screen.fill("black")
         game_paused = True
         if game_paused == True:
-            draw_text(f"{player_nickname}", font, Text_Color, (xsize/2)-tam_playerName, 25)
             if menu_state == "main":
+                global running
+                draw_text(f"{player_nickname}", font, Text_Color, (xsize/2)-tam_playerName, 25)
                 if resume_button.draw(screen):
-                    game_paused = False
+                    run = False
                     pygame.time.delay(100)
                 if quit_button.draw(screen):
-                    global running
                     running = False
                     run = False
                     pygame.time.delay(100)
@@ -324,28 +326,54 @@ def playPause():
                     if event.key == pygame.K_ESCAPE:
                         menu_state = "options"
             elif menu_state == "audio":
-                draw_text(f"Volume: {mixer.music.get_volume()}", font, Text_Color, (xsize/2)-tam_playerName, 25)
+                draw_text(f"Music", font, Text_Color, xsize/5 + 10, ysize/8)
                 mute = pygame.image.load("images/mute.png")
-                mute_button = button.Button((xsize/2) - 65,ysize/3,mute,keys_tam)
+                mute_button = button.Button((xsize/3) - 65,ysize/3,mute,keys_tam)
                 unmute = pygame.image.load("images/unmute.png")
-                unmute_button = button.Button((xsize/2) - 65,ysize/4,unmute,keys_tam)
+                unmute_button = button.Button((xsize/3) - 65,ysize/4,unmute,keys_tam)
                 volMax = pygame.image.load("images/vol_max.png")
-                volMax_button = button.Button((xsize/3) - 65,ysize/4,volMax,keys_tam)
+                volMax_button = button.Button((xsize/4) - 65*1.5,ysize/4,volMax,keys_tam)
                 volMin = pygame.image.load("images/vol_min.png")
-                volMin_button = button.Button((xsize/3) - 65,ysize/4,volMin,keys_tam)
-                volume = 100
+                volMin_button = button.Button((xsize/4) - 65*1.5,ysize/3,volMin,keys_tam)
+                
+
+                draw_text(f"FX", font, Text_Color, (xsize/8)*5 + 50, ysize/8)
+                FXmute = pygame.image.load("images/mute.png")
+                FXmute_button = button.Button((xsize/6)*4 - 65,ysize/3,FXmute,keys_tam)
+                FXunmute = pygame.image.load("images/unmute.png")
+                FXunmute_button = button.Button((xsize/6)*4 - 65,ysize/4,FXunmute,keys_tam)
+                FXvolMax = pygame.image.load("images/vol_max.png")
+                FXvolMax_button = button.Button((xsize/6)*5 - 65*1.5,ysize/4,FXvolMax,keys_tam)
+                FXvolMin = pygame.image.load("images/vol_min.png")
+                FXvolMin_button = button.Button((xsize/6)*5 - 65*1.5,ysize/3,FXvolMin,keys_tam)
+                
+                volume = mixer.Sound.get_volume(shooterFx)   #visualiza o volume atual da musica
                 if volMin_button.draw(screen):
-                    volume = volume - 10
-                    mixer.music.set_volume(volume)
+                    mixer.music.set_volume(volume - 0.01)
                 if volMax_button.draw(screen):
-                    volume = volume + 10
-                    mixer.music.set_volume(volume)
+                    mixer.music.set_volume(volume + 0.01)
                 if mute_button.draw(screen):
-                    volume=0
-                    mixer.music.set_volume(volume)
+                    mixer.music.set_volume(0)
                 if unmute_button.draw(screen):
-                    volume=100
-                    mixer.music.set_volume(volume)
+                    mixer.music.set_volume(0.5)
+                
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_CAPSLOCK:
+                        shooterFx.play()
+                        print('tiro')
+
+                #sound effects
+                volFx = shooterFx.get_volume()
+                if FXvolMin_button.draw(screen):
+                    shooterFx.set_volume(volFx - 0.01)
+                if FXvolMax_button.draw(screen):
+                    shooterFx.set_volume(volFx + 0.01)
+                if FXmute_button.draw(screen):
+                    shooterFx.set_volume(0)
+                if FXunmute_button.draw(screen):
+                    shooterFx.set_volume(1)
+                
                 if back_button.draw(screen):
                     menu_state = "options"
                     back_button = button.Button((xsize/2) - 65,ysize/2+50, back_img,keys_tam)
