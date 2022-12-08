@@ -133,6 +133,11 @@ def mainPage(run):
                 if event.type == pygame.KEYDOWN:                #Configuração de texto Nickname 
                     if event.key == pygame.K_BACKSPACE:
                         player_nickname = player_nickname[:-1]
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    game()
+
             if event.type == pygame.KEYDOWN:                #Configuração esc 
                 if event.key == pygame.K_ESCAPE:
                     player_nickname = player_nickname[:-1]
